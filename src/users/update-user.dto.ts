@@ -1,4 +1,5 @@
 import { IsOptional, IsString } from 'class-validator';
+import { CreatePostDto } from 'src/posts/create-post.dto';
 
 export class UpdateUserDto {
   @IsOptional()
@@ -15,4 +16,7 @@ export class UpdateUserDto {
   @IsOptional()
   @IsString()
   password?: string;
+
+  @IsOptional()
+  post?: CreatePostDto;
 }
