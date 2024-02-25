@@ -3,7 +3,6 @@ import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { MessagePattern } from '@nestjs/microservices';
 
-
 @Injectable()
 export class MailService {
   private mailTransporter;

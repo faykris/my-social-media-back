@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { Post } from '../posts/post.schema'; // Asegúrate de importar el esquema de Post
+import { Post } from '../posts/post.schema';
 
 export type UserDocument = User & Document;
 

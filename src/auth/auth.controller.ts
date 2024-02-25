@@ -22,7 +22,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Post('logout')
-  async logout(@Req() req, @Res() res) {
+  async logout(@Query('refresh_token') token: string, @Res() res) {
     return res.status(200).json({ message: 'Logged out successfully.' });
   }
 

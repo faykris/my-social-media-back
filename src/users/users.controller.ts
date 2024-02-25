@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Put, Req, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { UpdateUserDto } from './update-user.dto'; // Asegúrate de crear este DTO
+import { UpdateUserDto } from './update-user.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('user')

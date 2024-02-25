@@ -1,0 +1,393 @@
+openapi: 3.0.3
+info:
+  title: My Social Media 1.0
+  description: |-
+    This is an API that manages information about users and their posts.
+  version: 1.0.11
+externalDocs:
+  description: Find out more about this project in my GitHub Repository
+  url: https://github.com/faykris/my-social-media-back
+servers:
+  - url: https://localhost:3000
+    
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Auth
+      summary: Create user
+      description: Create a new user
+      operationId: registerUser
+      requestBody:
+        description: Add full name, email, password and age 
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegUser'
+      responses:
+        default:
+          description: Returns created user and encrypted password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/User'
+  /auth/login:
+    post:
+      tags:
+         - Auth
+      summary: Login user
+      description: Allow user access to app
+      operationId: loginUser
+      requestBody:
+        description: Add user email and correct password 
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+      responses:
+        default:
+          description: Returns JWT access token to manage session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessToken'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/AccessToken'
+  /auth/logout:
+    post:
+      tags:
+         - Auth
+      summary: Logout user
+      description: Send logout message (frontend needs remove access token)
+      operationId: logoutUser
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Add access token
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessToken'
+      responses:
+        default:
+          description: Returns confirmation message
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Logout'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Logout'
+  /auth/refresh:
+    get:
+      tags:
+        - Auth
+      summary: Refresh token (unavailable right now)
+      description: Refresh access token from user
+      operationId: refreshUser
+      parameters:
+        - name: access_token
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        default:
+          description: Returns confirmation message
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessToken'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/AccessToken'
+  /user:
+    get:
+      tags:
+        - User
+      summary: Get logged user
+      description: Retrieves information from logged user
+      operationId: getUser
+      security:
+        - bearerAuth: []
+      responses:
+        default:
+          description: Returns user object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/User'
+    put:
+      tags:
+        - User
+      summary: Update logged user
+      description: Updates information from logged user
+      operationId: updateUser
+      security:
+        - bearerAuth: []
+      responses:
+        default:
+          description: Returns updated user object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/User'
+    delete:
+      tags:
+        - User
+      summary: Soft delete logged user
+      description: Add deletedAt data in logged user
+      operationId: deleteUser
+      security:
+        - bearerAuth: []
+      responses:
+        default:
+          description: Returns updated user object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/User'
+  /post:
+    post:
+      tags:
+        - Post
+      summary: Create post
+      description: Add a post from user
+      operationId: createPost
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Add title and content
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegPost'
+      responses:
+        default:
+          description: Returns created post object from user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Post'
+    get:
+      tags:
+       - Post
+      summary: Get posts and filters
+      description: Update info from post from user
+      operationId: getPost
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: number
+        - name: perPage
+          in: query
+          required: false
+          schema:
+            type: number
+      responses:
+        default:
+          description: Returns updated post object from user
+          content:
+            application/json:
+              schema:
+                items: object
+                $ref: '#/components/schemas/ArrayPost'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ArrayPost'
+  /post/{id}:
+    put:
+      tags:
+       - Post
+      summary: Update post
+      description: Update info from post from user
+      operationId: updatePost
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        default:
+          description: Returns updated post object from user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Post'
+    delete:
+      tags:
+       - Post
+      summary: Soft delete post
+      description: Add deletedAt data in post
+      operationId: deletePost
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        default:
+          description: Returns updated post object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Post'
+      
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    RegUser:
+      type: object
+      properties:
+        fullName:
+          type: string
+          example: John Doe
+        age:
+          type: number
+          example: 45
+        email:
+          type: string
+          example: john@email.com
+        password:
+          type: string
+          example: 'john12345'
+      xml:
+        name: user
+    Login:
+      type: object
+      properties:
+        email:
+          type: string
+          example: john@email.com
+        password:
+          type: string
+          example: 'john12345'
+    Logout:
+      type: object
+      properties:
+        message:
+          type: string
+          example: 'Logged out successfully'
+    AccessToken:
+      type: object
+      properties:
+        access_token:
+          type: string
+          example: zfxfgjchjljlsdfsdksdfsdfiddsOISJFGdfgdfgDDSfdfgdODSB
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 11927327362167
+        fullName:
+          type: string
+          example: John Doe
+        age:
+          type: number
+          example: 45
+        email:
+          type: string
+          example: john@email.com
+        post:
+          type: array
+          example: []
+          items:
+           type: string
+        password:
+          type: string
+          example: '$2yfjs5sdfn.sd67bhsi7as8dsdj-kfsd...'
+        createdAt:
+          type: string
+          example: '2024-02-25T18:58:08.796Z'
+        updatedAt:
+          type: string
+          example: '2024-02-25T18:58:08.796Z'
+        __v:
+          type: number
+          example: 0
+      xml:
+        name: user
+    Post:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: '11927327362167'
+        title:
+          type: string
+          example: 'The title post'
+        content:
+          type: string
+          example: 'This is the content of this post'
+        likes:
+          type: number
+          example: 0
+        userId:
+          type: string
+          example: '451927329643683'
+        createdAt:
+          type: string
+          example: '2024-02-25T18:58:08.796Z'
+        updatedAt:
+          type: string
+          example: '2024-02-25T18:58:08.796Z'
+        __v:
+          type: number
+          example: 0
+      xml:
+        name: post
+    RegPost:
+      type: object
+      properties:
+        title:
+          type: string
+          example: 'The title post'
+        content:
+          type: string
+          example: 'This is the content of this post'
+    ArrayPost:
+      type: array
+      items: 
+        $ref: '#/components/schemas/Post'
