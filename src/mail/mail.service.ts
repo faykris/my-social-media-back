@@ -1,7 +1,7 @@
 // src/mail/mail.service.ts
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
-import { MessagePattern } from '@nestjs/microservices';
+import { Ctx, MessagePattern, Payload } from '@nestjs/microservices';
 
 @Injectable()
 export class MailService {
@@ -44,7 +44,8 @@ export class MailService {
   }
 
   @MessagePattern('send_mail')
-  async handleSendMail(data: {to: string, fullName: string}) {
+  async handleSendMail(@Payload()data: {to: string, fullName: string}, @Ctx() context) {
+
     const { to, fullName } = data;
     await this.sendWelcomeEmail(to, fullName);
   }

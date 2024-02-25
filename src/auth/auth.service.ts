@@ -54,8 +54,8 @@ export class AuthService {
     };
   
     // *** This was commented by problems with RabbitMQ ***
-    // this.mailClient.emit('mail_queue', mailMessage);
-    // console.log('Message published to the queue:', mailMessage);
+    // ! here is no matching event handler defined in the remote service. Event pattern: send_mail
+    // this.mailClient.emit('send_mail', mailMessage);
   
     try {
       await this.mailService.sendWelcomeEmail(user.email, user.fullName)
