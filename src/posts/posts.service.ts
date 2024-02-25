@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Post, PostDocument } from './post.schema';
@@ -24,10 +24,10 @@ export class PostsService {
     return newPost;
   }
 
-  async update(id: string, updatePostDto: UpdatePostDto, ): Promise<Post | null> {
+  async update(id: string, updatePostDto: UpdatePostDto, ): Promise<Post> {
     const post = await this.postModel.findById(id).exec();
     if (!post) {
-      return null;
+      throw new NotFoundException('Post Not Found');
     }
     return this.postModel.findByIdAndUpdate(
       id, {...updatePostDto, updatedAt: new Date()}, { new: true }
@@ -51,10 +51,10 @@ export class PostsService {
     return this.postModel.find(query).exec();
   }
 
-  async softDelete(id: string): Promise<Post | null> {
+  async softDelete(id: string): Promise<Post> {
     const post = await this.postModel.findById(id).exec();
     if (!post) {
-      return null;
+      throw new NotFoundException('Post Not Found');
     }
     await this.usersService.removePostFromUser(post.userId.toString(), id);
     return this.postModel.findByIdAndUpdate(id, { deletedAt: new Date() }, { new: true }).exec();
