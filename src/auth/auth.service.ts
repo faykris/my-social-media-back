@@ -24,7 +24,6 @@ export class AuthService {
 
   async register(createUserDto: CreateUserDto) {
     const user = await this.usersService.create(createUserDto);
-    // Omitir la contraseña en la respuesta
     const { password, ...result } = user;
     return result;
   }
@@ -36,16 +35,28 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload = { email: user.email, fullName: user.fullName };
+    const payload = { email: user.email, sub: user._id };
     return {
       access_token: this.jwtService.sign(payload),
     };
   }
 
-  async logout(user: any) {
+  async refreshToken(token: string) {
+    try {
+      const payload = this.jwtService.verify(token, { secret: process.env.REFRESH_TOKEN_SECRET });
+      const user = await this.usersService.findOne(payload.email);
+      if (!user) {
+        throw new Error('User not found');
+      }
+      const newAccessToken = this.jwtService.sign({ email: user.email, sub: user._id });
+      return {
+        access_token: newAccessToken,
+      };
+    } catch (error) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
   }
 
-  async refreshToken(user: any) {
-    // Implementar lógica para refrescar el token
+  async logout(user: any) {
   }
 }

@@ -1,9 +1,10 @@
-import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../users/create-user.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { LocalAuthGuard } from './local-auth.guard';
 import { LoginDto } from './login.dto';
+import { RefreshTokenGuard } from './refresh-token.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -22,12 +23,12 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('logout')
   async logout(@Req() req, @Res() res) {
-    return res.status(200).json({ message: 'Logged out successfully. Please remove the token on the client side.' });
+    return res.status(200).json({ message: 'Logged out successfully.' });
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(RefreshTokenGuard)
   @Get('refresh')
-  async refresh(@Req() req) {
-    return this.authService.refreshToken(req.user);
+  async refresh(@Query('refresh_token') token: string) {
+    return this.authService.refreshToken(token);
   }
 }

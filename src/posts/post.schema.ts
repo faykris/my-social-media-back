@@ -26,6 +26,7 @@ export class Post {
 
   @Prop({ type: Types.ObjectId, ref: User.name })
   userId: User | Types.ObjectId;
+
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);

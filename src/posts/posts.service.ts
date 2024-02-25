@@ -13,23 +13,42 @@ export class PostsService {
   constructor(
     @InjectModel(Post.name) private postModel: Model<PostDocument>,
     private usersService: UsersService
-) {}
+  ) {}
 
-async create(createPostDto: CreatePostDto, user: any): Promise<Post> {
-    const newPost = new this.postModel({ ...createPostDto, userId: user._id });
+  async create(createPostDto: CreatePostDto, user: any): Promise<Post> {
+    const newPost = new this.postModel({ ...createPostDto, userId: user.userId });
     await newPost.save();
 
-    await this.usersService.addPostToUser(user._id, newPost._id);
+    await this.usersService.addPostToUser(user.userId, newPost._id);
 
     return newPost;
   }
 
   async update(id: string, updatePostDto: UpdatePostDto, ): Promise<Post | null> {
-    return this.postModel.findByIdAndUpdate(id, updatePostDto, { new: true }).exec();
+    const post = await this.postModel.findById(id).exec();
+    if (!post) {
+      return null;
+    }
+    return this.postModel.findByIdAndUpdate(
+      id, {...updatePostDto, updatedAt: new Date()}, { new: true }
+    ).exec();
   }
 
-  async findAll(): Promise<Post[]> {
-    return this.postModel.find().exec();
+  async findAll(filter: { userId?: string, page?: number, perPage?: number }): Promise<Post[]> {
+    const { userId, page, perPage } = filter;
+    let query = {};
+
+    if (userId) {
+      query = { ...query, userId };
+    }
+
+    if (page && perPage) {
+      const skip = (page - 1) * perPage;
+      const limit = perPage;
+      return this.postModel.find(query).skip(skip).limit(limit).exec();
+    }
+
+    return this.postModel.find(query).exec();
   }
 
   async softDelete(id: string): Promise<Post | null> {
@@ -38,7 +57,6 @@ async create(createPostDto: CreatePostDto, user: any): Promise<Post> {
       return null;
     }
     await this.usersService.removePostFromUser(post.userId.toString(), id);
-    
     return this.postModel.findByIdAndUpdate(id, { deletedAt: new Date() }, { new: true }).exec();
   }
 }

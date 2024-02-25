@@ -22,7 +22,7 @@ export class UsersService {
   async addPostToUser(userId: string, postId: string): Promise<User | null> {
     return this.userModel.findByIdAndUpdate(
       userId,
-      { $push: { posts: postId } },
+      { $push: { posts: postId.toString() } },
       { new: true }
     ).exec();
   }
@@ -40,10 +40,14 @@ export class UsersService {
   }
 
   async update(email: string, updateUserDto: UpdateUserDto): Promise<User | null> {
-    return this.userModel.findOneAndUpdate({ email }, updateUserDto, { new: true }).exec();
+    return this.userModel.findOneAndUpdate(
+      { email }, { ...updateUserDto, updatedAt: new Date() }, { new: true }
+    ).exec();
   }
 
   async softDelete(email: string): Promise<User | null> {
-    return this.userModel.findOneAndUpdate({ email }, { deletedAt: new Date() }, { new: true }).exec();
+    return this.userModel.findOneAndUpdate(
+      { email }, { deletedAt: new Date() }, { new: true 
+    }).exec();
   }
 }
