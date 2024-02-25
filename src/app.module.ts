@@ -8,6 +8,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 // import { PostsController } from './posts/posts.controller';
 import { PostsModule } from './posts/posts.module';
+import { MessageQueueModule } from './message-queue/message-queue.module';
+import { MailService } from './mail/mail.service';
 
 @Module({
   imports: [
@@ -23,9 +25,10 @@ import { PostsModule } from './posts/posts.module';
     }),
     AuthModule,
     UsersModule,
-    PostsModule
+    PostsModule,
+    MessageQueueModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, MailService],
 })
 export class AppModule {}

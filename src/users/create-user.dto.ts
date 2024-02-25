@@ -5,7 +5,7 @@ export class CreateUserDto {
   @IsString()
   fullName: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   age?: number;
 
   @IsNotEmpty()

@@ -1,12 +1,14 @@
-// src/app.service.ts
+// src/mail/mail.service.ts
 import { Injectable } from '@nestjs/common';
-import { MailService } from './mail/mail.service';
 import * as nodemailer from 'nodemailer';
+import { MessagePattern } from '@nestjs/microservices';
+
 
 @Injectable()
-export class AppService {
+export class MailService {
   private mailTransporter;
-  constructor(private mailService: MailService) {
+
+  constructor() {
     this.mailTransporter = nodemailer.createTransport({
       host: 'in-v3.mailjet.com',
       port: 587,
@@ -18,9 +20,6 @@ export class AppService {
     });
   }
 
-  getHello(): string {
-    return 'Hello My Social Media!';
-  }
 
   async sendWelcomeEmail(email: string, fullName: string) {
     const mailMessage = {
@@ -41,7 +40,13 @@ export class AppService {
         html: mailMessage.html,
       });
     } catch (error) {
-      console.error('Error sending email', error);
+      console.error('Error al enviar correo electrónico:', error);
     }
+  }
+
+  @MessagePattern('send_mail')
+  async handleSendMail(data: {to: string, fullName: string}) {
+    const { to, fullName } = data;
+    await this.sendWelcomeEmail(to, fullName);
   }
 }
