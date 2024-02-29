@@ -4,9 +4,9 @@ import { CreateUserDto } from '../users/create-user.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { LocalAuthGuard } from './local-auth.guard';
 import { LoginDto } from './login.dto';
-import { RefreshTokenGuard } from './refresh-token.guard';
 import { Ctx, MessagePattern, Payload } from '@nestjs/microservices';
 import { MailService } from 'src/mail/mail.service';
+import { RefreshDto } from './refresh.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -31,10 +31,9 @@ export class AuthController {
     return res.status(200).json({ message: 'Logged out successfully.' });
   }
 
-  @UseGuards(RefreshTokenGuard)
-  @Get('refresh')
-  async refresh(@Query('refresh_token') token: string) {
-    return this.authService.refreshToken(token);
+  @Post('refresh')
+  async refresh(@Body() refreshDto: RefreshDto) {
+    return this.authService.refreshToken(refreshDto);
   }
 
   @MessagePattern('send_mail')

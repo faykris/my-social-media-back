@@ -6,6 +6,7 @@ import { CreateUserDto } from 'src/users/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './login.dto';
 import { ClientProxy, ClientProxyFactory, Transport } from '@nestjs/microservices';
+import { RefreshDto } from './refresh.dto';
 
 
 
@@ -57,29 +58,30 @@ export class AuthService {
 
   async login(loginDto: LoginDto) {
     const user = await this.usersService.findOne(loginDto.email);
-    
     if (!user || !(await bcrypt.compare(loginDto.password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
-
     const payload = { email: user.email, sub: user._id };
     return {
-      access_token: this.jwtService.sign(payload),
+      accessToken: this.jwtService.sign(payload),
     };
   }
 
-  async refreshToken(token: string) {
+  async refreshToken(refreshDto: RefreshDto) {
     try {
-      const payload = this.jwtService.verify(token, { secret: process.env.REFRESH_TOKEN_SECRET });
+      const payload = await this.jwtService.verify(
+        refreshDto.refreshToken, { secret: process.env.JWT_SECRET, ignoreExpiration: true }
+      );
       const user = await this.usersService.findOne(payload.email);
       if (!user) {
         throw new Error('User not found');
       }
       const newAccessToken = this.jwtService.sign({ email: user.email, sub: user._id });
       return {
-        access_token: newAccessToken,
+        accessToken: newAccessToken,
       };
     } catch (error) {
+      console.error(error)
       throw new UnauthorizedException('Invalid refresh token');
     }
   }
