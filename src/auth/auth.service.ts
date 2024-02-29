@@ -7,7 +7,8 @@ import * as bcrypt from 'bcrypt';
 import { LoginDto } from './login.dto';
 import { ClientProxy, ClientProxyFactory, Transport } from '@nestjs/microservices';
 import { RefreshDto } from './refresh.dto';
-
+import { Redis } from 'ioredis';
+import { InjectRedis } from '@nestjs-modules/ioredis';
 
 
 @Injectable()
@@ -17,6 +18,7 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    @InjectRedis() private readonly redis: Redis,
   ) {
     this.mailClient = ClientProxyFactory.create({
       transport: Transport.RMQ,
@@ -69,6 +71,10 @@ export class AuthService {
 
   async refreshToken(refreshDto: RefreshDto) {
     try {
+      const isBlacklisted = await this.redis.get(`blacklist:${refreshDto.refreshToken}`);
+      if (isBlacklisted) {
+        throw new Error('Access token has been closed');
+      }
       const payload = await this.jwtService.verify(
         refreshDto.refreshToken, { secret: process.env.JWT_SECRET, ignoreExpiration: true }
       );
@@ -81,12 +87,18 @@ export class AuthService {
         accessToken: newAccessToken,
       };
     } catch (error) {
-      console.error(error)
-      throw new UnauthorizedException('Invalid refresh token');
+      throw new UnauthorizedException(error.message);
     }
   }
 
-  async logout(user: any) {
-    // ? Unnecessary by now
+  async logout(accessToken: string) {
+    const decoded = this.jwtService.decode(accessToken);
+
+    await this.redis.set(`blacklist:${accessToken}`, 'true', 'EX', decoded.exp);
+
+    return {
+      statusCode: 201,
+      message: "Successfully logged out",
+    };
   }
 }

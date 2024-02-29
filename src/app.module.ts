@@ -8,6 +8,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { PostsModule } from './posts/posts.module';
 import { MessageQueueModule } from './message-queue/message-queue.module';
 import { MailService } from './mail/mail.service';
+import { RedisModule } from '@nestjs-modules/ioredis';
 
 @Module({
   imports: [
@@ -20,6 +21,10 @@ import { MailService } from './mail/mail.service';
         uri: configService.get<string>('MONGO_URI'),
       }),
       inject: [ConfigService],
+    }),
+    RedisModule.forRoot({
+      type: 'single',
+      url: 'redis://localhost:6379',
     }),
     AuthModule,
     UsersModule,
