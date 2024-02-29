@@ -66,12 +66,12 @@ paths:
       operationId: logoutUser
       security:
         - bearerAuth: []
-      requestBody:
-        description: Add access token
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AccessToken'
+      # requestBody:
+      #   description: Add access token
+      #   content:
+      #     application/json:
+      #       schema:
+      #         $ref: '#/components/schemas/AccessToken'
       responses:
         default:
           description: Returns confirmation message
@@ -83,7 +83,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Logout'
   /auth/refresh:
-    get:
+    post:
       tags:
         - Auth
       summary: Refresh token
@@ -269,7 +269,31 @@ paths:
             application/xml:
               schema:
                 $ref: '#/components/schemas/Post'
-      
+  /post/like/{id}:
+    put:
+      tags:
+       - Post
+      summary: Add like in post
+      description: Add 1 to likes value in post
+      operationId: likePost
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        default:
+          description: Returns updated post object with +1 like
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Post'
 components:
   securitySchemes:
     bearerAuth:
@@ -306,9 +330,12 @@ components:
     Logout:
       type: object
       properties:
+        statusCode:
+          type: number
+          example: 201
         message:
           type: string
-          example: 'Logged out successfully'
+          example: 'Successfully logged out'
     AccessToken:
       type: object
       properties:

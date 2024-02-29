@@ -4,8 +4,6 @@ import { Model } from 'mongoose';
 import { Post, PostDocument } from './post.schema';
 import { CreatePostDto } from './create-post.dto';
 import { UpdatePostDto } from './update-post.dto';
-import { User, UserDocument } from 'src/users/user.schema';
-import { UpdateUserDto } from 'src/users/update-user.dto';
 import { UsersService } from 'src/users/users.service';
 
 @Injectable()
@@ -24,13 +22,22 @@ export class PostsService {
     return newPost;
   }
 
-  async update(id: string, updatePostDto: UpdatePostDto, ): Promise<Post> {
+  async update(id: string, updatePostDto: UpdatePostDto ): Promise<Post> {
     const post = await this.postModel.findById(id).exec();
     if (!post) {
       throw new NotFoundException('Post Not Found');
     }
     return this.postModel.findByIdAndUpdate(
       id, {...updatePostDto, updatedAt: new Date()}, { new: true }
+    ).exec();
+  }
+  async likePost(id: string) {
+    const post = await this.postModel.findById(id).exec();
+    if (!post) {
+      throw new NotFoundException('Post Not Found');
+    }
+    return this.postModel.findByIdAndUpdate(
+      id, { likes: post.likes + 1, updatedAt: new Date()}, { new: true }
     ).exec();
   }
 
