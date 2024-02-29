@@ -19,20 +19,41 @@ export class MailService {
     });
   }
 
-
   async sendWelcomeEmail(email: string, fullName: string) {
-    const mailMessage = {
-      to: email,
-      subject: 'Registro exitoso',
-      html: `
-      <h1>Bienvenido <span>${fullName}<span> a Mi Red Social</h1>
-      <p>Ya podrás inciar sesión y compartir tus publicaciones con la comunidad.</p>
-      `,
-    };
-
-
     try {
-      await this.mailTransporter.sendMail({
+      const mailMessage = {
+        to: email,
+        subject: 'Registro exitoso',
+        html: `
+        <div style="background-color: #04C3C6; padding: .5rem 1.5rem;">
+          <h2 style="text-align: center;">
+            Bienvenido <span style="color: #04C3C6;">${fullName}</span> a My Social Media
+          </h2>
+        </div>
+        <div style="background-color: #020202; padding: .5rem 1rem; color: #FFFFFF;">
+          <p>
+            Ya eres parte de nuestra comunidad. Te invitamos a realizar tus primeras 
+            publicaciones y comparte con tus amigos cada suceso o pensamiento. 
+          </p>
+          <p>
+            Con cada publicación, tendrás la posibilidad de crecer aún más tu círculo 
+            de amistades y lograr tus metas con My Social Media.
+          </p>
+          <p>
+            En algún momento si lo deseas te podrás desvincular de nosotros. Por el momento 
+            te digo que disfrutes mucho de este espacio.
+          </p>
+          <p>
+            Cordialmente.
+          </p>
+          <h4 style="color: #30C604;">
+            My Social App
+          </h4>
+        </div>
+        `,
+      };
+    
+      return await this.mailTransporter.sendMail({
         from: '"My Social Media" <faykris28@gmail.com>',
         to: mailMessage.to,
         subject: mailMessage.subject,
@@ -43,10 +64,4 @@ export class MailService {
     }
   }
 
-  @MessagePattern('send_mail')
-  async handleSendMail(@Payload()data: {to: string, fullName: string}, @Ctx() context) {
-
-    const { to, fullName } = data;
-    await this.sendWelcomeEmail(to, fullName);
-  }
 }

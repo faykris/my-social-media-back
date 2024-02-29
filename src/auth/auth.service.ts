@@ -2,7 +2,6 @@ import { BadRequestException, Inject, Injectable, NotFoundException, Unauthorize
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/user.schema';
-import { MailService } from 'src/mail/mail.service';
 import { CreateUserDto } from 'src/users/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './login.dto';
@@ -16,7 +15,6 @@ export class AuthService {
 
   constructor(
     private usersService: UsersService,
-    private mailService: MailService,
     private jwtService: JwtService,
   ) {
     this.mailClient = ClientProxyFactory.create({
@@ -31,16 +29,15 @@ export class AuthService {
     });
   }
 
-  async validateUser(email: string, pass: string) {
+  async validateUser(email: string, pass: string): Promise<User> {
     const user = await this.usersService.findOne(email);
     if (user && await bcrypt.compare(pass, user.password)) {
-        const { password, ...result } = user;
-        return result;
+        return user;
     }
     throw new NotFoundException('User was not found');
   }
 
-  async register(createUserDto: CreateUserDto) {
+  async register(createUserDto: CreateUserDto): Promise<User> {
     const existingUser = await this.usersService.findOne(createUserDto.email);
     if (existingUser) {
       throw new BadRequestException('Email already was registed with other user');
@@ -52,17 +49,9 @@ export class AuthService {
       to: user.email,
       fullName: user.fullName,
     };
-  
-    // *** This was commented by problems with RabbitMQ ***
-    // ! here is no matching event handler defined in the remote service. Event pattern: send_mail
-    // this.mailClient.emit('send_mail', mailMessage);
-  
-    try {
-      await this.mailService.sendWelcomeEmail(user.email, user.fullName)
-    } catch (error) {
-      console.error('Error publishing message to the queue:', error);
-    } 
-
+    // * Send email into message queue 
+    this.mailClient.emit('send_mail', mailMessage);
+ 
     return user;
   }
 

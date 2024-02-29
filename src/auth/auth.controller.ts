@@ -5,10 +5,15 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 import { LocalAuthGuard } from './local-auth.guard';
 import { LoginDto } from './login.dto';
 import { RefreshTokenGuard } from './refresh-token.guard';
+import { Ctx, MessagePattern, Payload } from '@nestjs/microservices';
+import { MailService } from 'src/mail/mail.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private mailService: MailService
+  ) {}
 
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {
@@ -30,5 +35,11 @@ export class AuthController {
   @Get('refresh')
   async refresh(@Query('refresh_token') token: string) {
     return this.authService.refreshToken(token);
+  }
+
+  @MessagePattern('send_mail')
+  async handleSendMail(@Payload()data: {to: string, fullName: string}) {
+    const { to, fullName } = data;
+    await this.mailService.sendWelcomeEmail(to, fullName);
   }
 }
