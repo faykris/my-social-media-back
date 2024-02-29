@@ -24,7 +24,7 @@ import { RedisModule } from '@nestjs-modules/ioredis';
     }),
     RedisModule.forRoot({
       type: 'single',
-      url: 'redis://localhost:6379',
+      url: process.env.REDIS_URL,
     }),
     AuthModule,
     UsersModule,

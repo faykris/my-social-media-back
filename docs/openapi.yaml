@@ -66,12 +66,6 @@ paths:
       operationId: logoutUser
       security:
         - bearerAuth: []
-      # requestBody:
-      #   description: Add access token
-      #   content:
-      #     application/json:
-      #       schema:
-      #         $ref: '#/components/schemas/AccessToken'
       responses:
         default:
           description: Returns confirmation message
