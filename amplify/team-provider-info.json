@@ -10,6 +10,11 @@
       "StackName": "amplify-mysocialmedia-staging-172821",
       "StackId": "arn:aws:cloudformation:us-east-2:058264364006:stack/amplify-mysocialmedia-staging-172821/ec9c4fc0-e095-11ee-af02-068918fcf44f",
       "AmplifyAppId": "d1uxx0sbdq16j9"
+    },
+    "categories": {
+      "auth": {
+        "mysocialmedia": {}
+      }
     }
   }
 }

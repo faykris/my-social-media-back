@@ -1,0 +1,12 @@
+{
+  "version": "1",
+  "cognitoConfig": {
+    "identityPoolName": "mysocialmedia_identitypool_07517ba1",
+    "allowUnauthenticatedIdentities": true,
+    "authSelections": "identityPoolOnly",
+    "resourceName": "mysocialmedia",
+    "sharedId": "07517ba1",
+    "serviceName": "Cognito",
+    "useDefault": "manual"
+  }
+}
