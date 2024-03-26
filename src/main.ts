@@ -6,9 +6,9 @@ const cors = require('cors');
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // app.use(cors({
-  //   origin: '*'
-  // }));
+  app.use(cors({
+    origin: '*'
+  }));
 
   app.enableCors({
     origin: '*'
